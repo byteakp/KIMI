@@ -1,0 +1,221 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 7%; /* Charcoal #111111 */
+    --foreground: 0 0% 80%; /* Light gray #cccccc */
+    --card: 0 0% 9%; /* Slightly lighter charcoal */
+    --card-foreground: 0 0% 80%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 80%;
+    --primary: 270 80% 50%; /* Purple */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 15%; /* Darker gray for secondary elements */
+    --secondary-foreground: 0 0% 90%;
+    --muted: 0 0% 12%; /* Muted background for subtle elements */
+    --muted-foreground: 0 0% 60%;
+    --accent: 270 80% 30%; /* Darker purple for accents */
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%; /* Darker border */
+    --input: 0 0% 15%;
+    --ring: 270 80% 50%;
+
+    --purple: 270 80% 50%; /* Base purple for consistency */
+    --purple-dark: 270 80% 30%; /* Darker purple */
+    --purple-light: 270 80% 70%; /* Lighter purple for effects */
+
+    /* Sidebar specific colors from shadcn/ui docs [^5] */
+    --sidebar-background: 0 0% 7%; /* Charcoal */
+    --sidebar-foreground: 0 0% 80%; /* Light gray */
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 240 5.9% 10%;
+    --sidebar-accent: 0 0% 12%; /* Muted charcoal for sidebar accent */
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 270 80% 50%;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 80%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 80%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 80%;
+    --primary: 270 80% 50%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 270 80% 30%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
+    --ring: 270 80% 50%;
+
+    --purple: 270 80% 50%;
+    --purple-dark: 270 80% 30%;
+    --purple-light: 270 80% 70%;
+
+    /* Sidebar specific colors from shadcn/ui docs [^5] */
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 80%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 240 5.9% 10%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 270 80% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    height: 100vh; /* Ensure body takes full viewport height */
+  }
+}
+
+/* Custom CSS for Kimi UI states */
+.initial-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center */
+  align-items: center; /* Horizontally center */
+  height: 100%; /* Take full height of parent (which is 100vh from layout) */
+  gap: 2rem; /* Space between logo and input area */
+}
+
+.chat-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Take full height of parent */
+  max-height: 100%; /* Prevent overflow on mobile */
+}
+
+.chat-view #chat-log {
+  flex-grow: 1; /* Make the chat log take up all available space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 1rem;
+}
+
+.chat-view #input-area {
+  flex-shrink: 0; /* Prevent the input area from shrinking */
+}
+
+/* Animations for chat bubbles */
+.chat-bubble {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slide-in 0.3s forwards;
+}
+
+@keyframes slide-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* CSS for the blinking cursor */
+.typing-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.2em;
+  background-color: var(--foreground); /* Use foreground color for visibility */
+  animation: blink 1s infinite;
+  margin-left: 2px; /* Small space from text */
+  vertical-align: middle; /* Align with text baseline */
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* New animation for KIMI text */
+@keyframes kimi-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+    text-shadow: 0 0 5px rgba(138, 43, 226, 0.5); /* Subtle purple glow */
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+    text-shadow: 0 0 15px rgba(138, 43, 226, 0.8), 0 0 30px rgba(138, 43, 226, 0.4); /* Stronger glow */
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+    text-shadow: 0 0 5px rgba(138, 43, 226, 0.5);
+  }
+}
+
+/* Animated Gradient Ring (Modern & Techy) */
+@keyframes gradient-rotate {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.ai-icon-gradient-ring {
+  position: relative;
+  /* Ensure the background is visible */
+  background-color: hsl(var(--purple)); /* Fallback or base color */
+  overflow: hidden; /* Hide the overflow of the pseudo-element */
+  z-index: 0; /* Ensure it's above the main background but allows pseudo-element */
+}
+
+.ai-icon-gradient-ring::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    hsl(var(--purple-light)) 0%,
+    hsl(var(--purple)) 20%,
+    transparent 50%,
+    hsl(var(--purple)) 80%,
+    hsl(var(--purple-light)) 100%
+  );
+  animation: gradient-rotate 2s linear infinite;
+  z-index: -1; /* Place behind the icon */
+  border-radius: inherit; /* Inherit border-radius from parent */
+}
+
+/* "Breathing" Glow Effect (Subtle & Alive) */
+@keyframes breathing-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px hsl(var(--purple)), 0 0 10px hsl(var(--purple-light));
+  }
+  50% {
+    box-shadow: 0 0 15px hsl(var(--purple)), 0 0 30px hsl(var(--purple-light));
+  }
+}
+
+.ai-icon-breathing-glow {
+  animation: breathing-glow 2s ease-in-out infinite;
+}
