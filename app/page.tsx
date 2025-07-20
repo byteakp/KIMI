@@ -1,16 +1,15 @@
 "use client"
 
 import * as React from "react"
-
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
+import { useSidebar } from "@/components/ui/sidebar"
 import { ChatMessages } from "@/components/chat-messages"
 import { SuggestionChips } from "@/components/suggestion-chips"
 import { useChat } from "@/hooks/use-chat"
 import { useAuth } from "@/context/auth-context"
 import { cn } from "@/lib/utils"
 import { ChatInputBar } from "@/components/chat-input-bar"
-import { useChatHistory } from "@/context/chat-history-context" // Import useChatHistory
-import { AppSidebar } from "@/components/app-sidebar" // Ensure AppSidebar is imported
+import { useChatHistory } from "@/context/chat-history-context"
+import { AppSidebar } from "@/components/app-sidebar"
 
 export default function HomePage() {
   const {
@@ -19,9 +18,9 @@ export default function HomePage() {
     handleInputChange,
     handleSubmit,
     isLoading,
-    isThinking, // Destructure isThinking
+    isThinking,
     thinkingSteps,
-    reasoningText, // Destructure reasoningText
+    reasoningText,
     selectedModel,
     setSelectedModel,
     enableSearch,
@@ -34,99 +33,91 @@ export default function HomePage() {
     attachedFile,
     setAttachedFile,
     searchResults,
-    resetChat, // Get resetChat from useChat
+    resetChat,
   } = useChat({
-    onNewConversationCreated: useChatHistory().fetchChatHistory, // Pass fetchChatHistory as callback
+    onNewConversationCreated: useChatHistory().fetchChatHistory,
   })
-  const { isLoggedIn } = useAuth()
-  const [showInitialView, setShowInitialView] = React.useState(true)
-  const { isOpen } = useSidebar()
 
-  const [researcherMode, setResearcherMode] = React.useState(false)
+  const [showInitialView, setShowInitialView] = React.useState(messages.length === 0)
 
   React.useEffect(() => {
-    // Switch to chat view if messages exist
-    if (messages.length > 0) {
-      setShowInitialView(false)
-    } else {
-      setShowInitialView(true)
-    }
+    setShowInitialView(messages.length === 0)
   }, [messages])
 
   const handleSuggestionClick = (suggestion: string) => {
     handleInputChange({ target: { value: suggestion } } as React.ChangeEvent<HTMLTextAreaElement>)
-    handleSubmit(new Event("submit") as unknown as React.FormEvent<HTMLFormElement>)
+    const form = document.getElementById("chat-form") as HTMLFormElement
+    if (form) {
+      handleSubmit(new Event("submit", { bubbles: true }) as unknown as React.FormEvent<HTMLFormElement>)
+    }
   }
 
   const handleNewChatClick = () => {
-    resetChat() // Reset chat data
-    setShowInitialView(true) // Show initial view
-    // Sidebar will automatically re-fetch history via onNewConversationCreated callback
+    resetChat()
+    setShowInitialView(true)
   }
 
-  return (
-    <div
-      id="app-container" // Added ID for CSS targeting
-      className={cn(
-        "flex-1 bg-charcoal text-light-gray transition-all duration-300 ease-in-out",
-        isOpen ? "ml-64" : "ml-0",
-        showInitialView ? "initial-view" : "chat-view", // Apply dynamic classes
-      )}
-    >
-      {!isOpen && (
-        <div className="absolute top-4 left-4 z-[99]">
-          <SidebarTrigger tooltip="Toggle Sidebar" />
-        </div>
-      )}
+  // Helper object to avoid repeating props
+  const chatInputProps = {
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    selectedModel,
+    setSelectedModel,
+    enableSearch,
+    setEnableSearch,
+    extendedThinking,
+    setExtendedThinking,
+    models,
+    handleFileChange,
+    fileInputRef,
+    attachedFile,
+    setAttachedFile,
+  };
 
-      {/* Pass onNewChatClick to AppSidebar */}
+  return (
+    <div className="flex h-screen w-full bg-background text-foreground">
       <AppSidebar onNewChatClick={handleNewChatClick} />
 
-      {/* Welcome Screen (visible only in initial view) */}
-      <div id="welcome-screen" className={cn("text-center", !showInitialView && "hidden")}>
-        <h1 className="text-7xl font-bold text-light-gray mb-4 animate-kimi-pulse">KIMI</h1>
-        <p className="text-sm text-muted-foreground">made by byteakp</p>
-      </div>
-
-      {/* Chat Log (visible only in chat view) */}
-      <div id="chat-log" className={cn(showInitialView && "hidden", "flex-grow p-4 overflow-y-auto")}>
-        {!showInitialView && (
-          <div id="message-container" className="max-w-4xl mx-auto space-y-4">
-            <ChatMessages
-              messages={messages}
-              thinkingSteps={thinkingSteps}
-              isLoading={isLoading}
-              isThinking={isThinking} // Pass isThinking
-              searchResults={searchResults}
-              reasoningText={reasoningText} // Pass reasoningText
-            />
+      {/* Main Content Area */}
+      <main className="flex h-screen flex-1 flex-col transition-all duration-300 ease-in-out">
+        {showInitialView ? (
+          // --- INITIAL VIEW ---
+          <div className="flex flex-grow flex-col items-center justify-center">
+            <div className="text-center">
+              <h1 className="mb-4 text-7xl font-bold">KIMI</h1>
+              {/* --- THIS IS THE UPDATED SUBTITLE --- */}
+              <p className="text-sm text-muted-foreground">
+                An open-source project by byteakp. Login is required to save chat history and use the AI models.
+              </p>
+            </div>
+            <div className="w-full max-w-4xl p-4">
+              <ChatInputBar {...chatInputProps} />
+              <SuggestionChips onChipClick={handleSuggestionClick} />
+            </div>
           </div>
+        ) : (
+          // --- CHAT VIEW ---
+          <>
+            <div className="flex-grow overflow-y-auto p-4">
+              <div className="mx-auto max-w-4xl space-y-4">
+                <ChatMessages
+                  messages={messages}
+                  thinkingSteps={thinkingSteps}
+                  isLoading={isLoading}
+                  isThinking={isThinking}
+                  searchResults={searchResults}
+                  reasoningText={reasoningText}
+                />
+              </div>
+            </div>
+            <div className="w-full flex-shrink-0 p-4">
+              <ChatInputBar {...chatInputProps} />
+            </div>
+          </>
         )}
-      </div>
-
-      {/* Input Area (always present, but positioned differently) */}
-      <div id="input-area" className="w-full flex flex-col items-center p-4 pb-8">
-        <ChatInputBar
-          input={input}
-          handleInputChange={handleInputChange}
-          handleSubmit={handleSubmit}
-          isLoading={isLoading}
-          selectedModel={selectedModel}
-          setSelectedModel={setSelectedModel}
-          enableSearch={enableSearch}
-          setEnableSearch={setEnableSearch}
-          extendedThinking={extendedThinking}
-          setExtendedThinking={setExtendedThinking}
-          models={models}
-          handleFileChange={handleFileChange}
-          fileInputRef={fileInputRef}
-          attachedFile={attachedFile}
-          setAttachedFile={setAttachedFile}
-          researcherMode={researcherMode}
-          setResearcherMode={setResearcherMode}
-        />
-        {showInitialView && <SuggestionChips onChipClick={handleSuggestionClick} />}
-      </div>
+      </main>
     </div>
   )
 }
